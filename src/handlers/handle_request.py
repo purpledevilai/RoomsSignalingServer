@@ -1,10 +1,12 @@
 from rpc.models.request import Request
 from models.Connection import Connection
 from lib.send_response import send_response
-from src.handlers.requests.handle_join_room import handle_join_room
+from handlers.requests.handle_join_room import handle_join_room
+from handlers.requests.handle_ice_candidate import handle_ice_candidate
 
 request_handler_registry = {
-    "handle_join_room": handle_join_room,
+    "join_room": handle_join_room,
+    "ice_candidate": handle_ice_candidate,
 }
 
 async def handle_request(req: Request, connection: Connection):

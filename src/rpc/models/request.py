@@ -5,3 +5,4 @@ class Request(BaseModel):
     id: Optional[str] = None
     method: str
     params: Optional[dict] = {}
+    type: str = "request"

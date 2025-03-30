@@ -6,7 +6,6 @@ from rpc.models.request import Request
 
 
 async def send_request(method: str, connection: Connection, params: dict = {}, await_response: bool = False):
-    
     # Set request id if awaiting response
     request_id = None
     if await_response:
@@ -15,8 +14,9 @@ async def send_request(method: str, connection: Connection, params: dict = {}, a
         request_responses[request_id] = None
 
     # Create request
-    request = Request(method=method, params=params, request_id=request_id)
-
+    request = Request(method=method, params=params, id=request_id)
+    print(f"Sending request", request.model_dump())
+    
     # Send request
     await connection.websocket.send_json(request.model_dump())
 
@@ -26,10 +26,12 @@ async def send_request(method: str, connection: Connection, params: dict = {}, a
     
     # Await response
     while request_responses[request_id] == None:
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(1)
+        print("Awaiting response....")
 
     # Get response
     response = request_responses.pop(request_id)
+    print(f"Received response", response.model_dump())
 
     # Return data
     return response.data

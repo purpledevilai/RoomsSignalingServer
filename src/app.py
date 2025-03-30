@@ -1,7 +1,10 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from models import Connection
+import asyncio
+from models.Connection import Connection
+from stores.connections import connections
 from handle_message import handle_message
+import uuid
 
 app = FastAPI()
 
@@ -27,13 +30,15 @@ async def websocket_endpoint(websocket: WebSocket):
     print("Connection opened")
 
     # Create a Connection object
-    connection = Connection.Connection(websocket=websocket)
+    connection_id = str(uuid.uuid4())
+    connection = Connection(id=connection_id, websocket=websocket)
+    connections[connection_id] = connection
 
     try:
         # Handle messages
         while True:
             message = await websocket.receive_text()
-            await handle_message(connection, message)
+            asyncio.create_task(handle_message(connection, message))
 
     except WebSocketDisconnect:
         print("Connection closed")
