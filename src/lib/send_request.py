@@ -26,7 +26,7 @@ async def send_request(method: str, connection: Connection, params: dict = {}, a
     
     # Await response
     while request_responses[request_id] == None:
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         print("Awaiting response....")
 
     # Get response
