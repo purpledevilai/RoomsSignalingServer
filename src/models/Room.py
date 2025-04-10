@@ -27,3 +27,7 @@ class Room(BaseModel):
         # Add the new peer to the list
         print("adding peer to room")
         self.peers[peer.id] = peer
+
+    async def remove_peer(self, peer: "Peer"):
+        # Remove peer from list
+        self.peers.pop(peer.id)

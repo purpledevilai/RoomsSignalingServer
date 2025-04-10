@@ -5,6 +5,7 @@ from models.Connection import Connection
 from stores.connections import connections
 from handle_message import handle_message
 import uuid
+from lib.remove_peer_from_room import remove_peer_from_room
 
 app = FastAPI()
 
@@ -47,4 +48,9 @@ async def websocket_endpoint(websocket: WebSocket):
         print("There was an error with the WebSocket connection:", e)
 
     finally:
-        await websocket.close()
+        if connection.peer:
+            await remove_peer_from_room(connection.peer)
+        try:
+            await websocket.close()
+        except:
+            pass
