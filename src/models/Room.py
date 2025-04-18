@@ -1,14 +1,13 @@
 from pydantic import BaseModel
 from typing import TYPE_CHECKING, Dict
+from lib.send_request import send_request
+from stores.connections import connections
 
 if TYPE_CHECKING:
     from models.Peer import Peer  # imported only for type hints
 
-from lib.connect_peers import connect_peers
-
 class Room(BaseModel):
     room_id: str
-    # Forward-reference "Peer" to avoid importing it at runtime
     peers: Dict[str, "Peer"] = {}
 
     async def add_peer(self, peer: "Peer"):
@@ -19,10 +18,25 @@ class Room(BaseModel):
             self.peers = {peer.id: peer}
             return
         
-        # Otherwise establish connections with each peer
+        # Otherwise aleart the new peer to all other peers
         for other_peer in self.peers.values():
-            print(f"Connecting Peers {other_peer.id} and {peer.id}")
-            await connect_peers(peer, other_peer)
+            print(f"Alerting peer {other_peer.id} to new peer {peer.id}")
+            # Get other peer connection to send the request
+            connection = connections[other_peer.connection_id]
+
+            # Check other peer connection
+            if connection is None:
+                raise Exception(f"Connection with id {other_peer.connection_id} does not exist. Attempting to request connection")
+            
+            # Send the new peer to the other peer connection
+            await send_request(
+                method="peer_added",
+                params={
+                    "peer_id": peer.id,
+                    "self_description": peer.self_description,
+                },
+                connection=connection
+            )
         
         # Add the new peer to the list
         print("adding peer to room")

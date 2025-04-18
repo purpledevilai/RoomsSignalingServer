@@ -6,6 +6,7 @@ from stores.connections import connections
 class Peer(BaseModel):
     id: str
     connection_id: str
+    self_description: str
     room_id: str
 
     async def create_rtc_peer_connection_and_offer(self, ref_id: str) -> dict:

@@ -5,7 +5,7 @@ from models.Peer import Peer
 import uuid
 
 
-async def handle_join_room(room_id: str, connection: Connection):
+async def handle_join_room(room_id: str, self_description: str, connection: Connection):
     # Check for room_id
     if room_id == None:
         raise Exception("No room_id provided")
@@ -20,7 +20,7 @@ async def handle_join_room(room_id: str, connection: Connection):
     room = rooms[room_id]
 
     # Create peer
-    peer = Peer(id=str(uuid.uuid4()), connection_id=connection.id, room_id=room_id)
+    peer = Peer(id=str(uuid.uuid4()), self_description=self_description, connection_id=connection.id, room_id=room_id)
     print("Peer created", peer)
 
     # Set peer on connection

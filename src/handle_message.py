@@ -10,27 +10,22 @@ async def handle_message(connection: Connection, message: str):
         # Parse the JSON message
         data = json.loads(message)
         print("received message", data)
-
-        # Get the message type
-        type = data.get("type")
-        if (type == None):
-            raise Exception("No type provided")
-        
-        # Check if the type is request or response
-        if (type != "request" and type != "response"):
-            raise Exception("Invalid type provided")
         
         # Request
-        if (type == "request"):
+        if ("method" in data):
             req = request.Request(**data)
             print("received request", req.model_dump())
             await handle_request(req, connection)
 
         # Response
-        if (type == "response"):
+        elif ("result" in data):
             res = response.Response(**data)
             print("received response", res.model_dump())
             handle_response(res)
+
+        # Not recognised
+        else:
+            raise Exception("Message not recognised")
 
     except Exception as e:
         print(f"\nError handling message\nMESSAGE\n{message}\nERROR\n{e}\n")

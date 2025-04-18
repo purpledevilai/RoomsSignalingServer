@@ -34,4 +34,4 @@ async def send_request(method: str, connection: Connection, params: dict = {}, a
     print(f"Received response", response.model_dump())
 
     # Return data
-    return response.data
+    return response.result
