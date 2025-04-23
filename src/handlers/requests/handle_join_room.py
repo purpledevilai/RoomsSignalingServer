@@ -26,9 +26,14 @@ async def handle_join_room(room_id: str, self_description: str, connection: Conn
     # Set peer on connection
     connection.peer = peer
 
+    # Create copy of existing peers
+    existing_peers = [{
+        "id": room.peers[key].id,
+        "self_description": room.peers[key].self_description,
+    } for key in room.peers.keys()]
+
     # Add peer to room
     print("Adding peer to room")
     await room.add_peer(peer)
 
-
-    return {"success": True}
+    return {"existing_peers": existing_peers}
