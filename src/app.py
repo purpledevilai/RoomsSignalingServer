@@ -6,6 +6,7 @@ from stores.connections import connections
 from handle_message import handle_message
 import uuid
 from lib.remove_peer_from_room import remove_peer_from_room
+from stores.rooms import rooms
 
 app = FastAPI()
 
@@ -22,6 +23,20 @@ app.add_middleware(
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+@app.get("/reset/{room_id}")
+async def reset_room(room_id: str):
+    # Check if the room exists
+    room = rooms.get(room_id)
+    if not room:
+        return {"Error": "room room_id does not exist"}
+
+    # Remove all peers from the room
+    peers_to_remove = list(room.peers.values())  # Copy to avoid modification during iteration
+    for peer in peers_to_remove:
+        await remove_peer_from_room(peer)
+
+    return {"status": "room reset successfully"}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
